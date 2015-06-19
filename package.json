@@ -1,0 +1,6 @@
+{
+  "name": "easyperformance",
+  "version": "0.0.2",
+  "main":"./lib.js",
+  "dependencies":{}
+}
