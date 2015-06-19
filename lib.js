@@ -4,8 +4,17 @@
 
 (function (exports) {
 
+    var fs = require('fs');
+
     function Performance() {
         this.starttime = new Date();
+        this.logfile = __dirname + "/log/log.log";
+        this.average = [];
+    }
+
+    Performance.prototype.setLogfile(file)
+    {
+        this.logfile = file;
     }
 
     Performance.prototype.start = function () {
@@ -16,9 +25,10 @@
         this.endtime = new Date();
     };
 
-    Performance.prototype.result = function () {
+    Performance.prototype.result = function (msg) {
+        msg = msg || "Performance: ";
         this.elapse = this.endtime - this.starttime;
-        return "Performance: " + this.elapse + "ms (" + 1000 / this.elapse + "HZ)";
+        return msg + this.elapse + "ms (" + 1000 / this.elapse + "HZ)";
     };
 
     Performance.prototype.time = function () {
@@ -26,12 +36,35 @@
         return this.elapse;
     };
 
-    Performance.prototype.outputTiming = function (msg) {
-        msg = msg || "Last step took";
-        this.elapse = this.endtime - this.starttime;
-        output = "\r\n" + msg + " " + this.elapse + "ms (" + 1000 / this.elapse + "HZ)";
-        console.log(output);
-        return output;
+    Performance.prototype.logTiming = function (msg) {
+        console.log(this.result(msg));
+    };
+
+    Performance.prototype.logToFile = function (msg, filename) {
+        filename = filename || this.logfile;
+        msg = msg || this.result();
+        fs.appendFile(filename, msg);
+    };
+
+    Performance.prototype.addAverage = function (time) {
+        this.average.push(time);
+    };
+
+    Performance.prototoype.clearAverage = function () {
+        this.average = [];
+    };
+
+    Performance.prototype.getAverage = function () {
+        var sum = 0, count = this.average.length, avg;
+        this.average.forEach(function (i) {
+            sum += i;
+        });
+        try {
+            avg = sum / count;
+        } catch (e) {
+            avg = null;
+        }
+        return avg;
     };
 
     exports.Performance = Performance;
